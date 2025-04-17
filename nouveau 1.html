@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obtenir votre position</title>
+</head>
+<body>
+    <h1>Bonjour !</h1>
+    <p>Pour continuer, nous avons besoin de connaître votre position géographique.</p>
+    <button onclick="getLocation()">Accepter la géolocalisation</button>
+    
+    <h2>Vos coordonnées actuelles :</h2>
+    <p id="position">Aucune donnée disponible.</p>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                // Demande la position de l'utilisateur
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("La géolocalisation n'est pas supportée par ce navigateur.");
+            }
+        }
+
+        // Fonction qui affiche la position obtenue
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+
+            document.getElementById("position").innerHTML = "Latitude: " + lat + "<br>Longitude: " + lon;
+
+            // Envoie ces données à ton serveur ou une base de données
+            sendPositionToServer(lat, lon);
+        }
+
+        // Fonction qui gère les erreurs (par exemple si l'utilisateur refuse de partager sa position)
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Vous avez refusé de partager votre position.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Impossible d'obtenir votre position.");
+                    break;
+                case error.TIMEOUT:
+                    alert("La demande a expiré.");
+                    break;
+                default:
+                    alert("Erreur inconnue.");
+                    break;
+            }
+        }
+
+        // Envoie les coordonnées à un serveur pour les enregistrer
+        function sendPositionToServer(lat, lon) {
+            // Exemple de requête fetch vers un serveur (tu peux remplacer l'URL par celle de ton serveur)
+            fetch(`https://tonserveur.com/enregistrer_position?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Position envoyée avec succès", data);
+                })
+                .catch(error => {
+                    console.error("Erreur lors de l'envoi des données :", error);
+                });
+        }
+    </script>
+</body>
+</html>
